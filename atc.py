@@ -6,6 +6,9 @@
 #Create a function named extractData that takes a line of input and uses the split() function you developed in lab 3 to parse it into the five components.
 #Create another function named buildTableRow that takes several parameters with the information for one row of the table and creates a properly formed HTML string for the row. Use this function to generate your output table.
 
+import os
+import codecs
+
 
 def extractData(coords: str) -> (str, float, float, float, float):
     """ takes the input from user and gets it ready to extract.
@@ -15,22 +18,24 @@ def extractData(coords: str) -> (str, float, float, float, float):
     aircraft_type = coords.split(":", 1)
     x_coord, y_coord, heading, speed = aircraft_type[1].split(",")
 
-    return aircraft_type, float(x_coord), float(y_coord), float(heading), float(speed)
+    return aircraft_type[0], float(x_coord), float(y_coord), float(heading), float(speed)
 
 
-def buildTableRow(aircraft_type: str, x_coord: float, y_coord: float, heading: float, speed: float) -> (str):
-    row = "<tr><td>1</td><td>{0}.png</td><td>({1},{2})</td><td>{3}</td><td>{4}</td></tr>".format(
-        aircraft_type, str(x_coord), str(y_coord), str(heading), str(speed))
+def buildTableRow(position: int, aircraft_type: str, x_coord: float, y_coord: float, heading: float, speed: float) -> (str):
+    row = "<tr><td>{0}</td><td><img src='{1}.png'></td><td>({2},{3})</td><td>{4}</td><td>{5}</td></tr>".format(
+        str(position), aircraft_type, str(x_coord), str(y_coord), str(heading), str(speed))
     return row
 
 
 def createHTMLFile(input):
 
     tableRows = ""
+    position = 1
 
     for item in input:
-        tableRows += buildTableRow(item.get("aircraft"), item.get("x"),
-                                   item.get("y"), item.get("heading"), item.get("speed"))
+        tableRows += buildTableRow(position, item["aircraft"], item["x"],
+                                   item["y"], item["heading"], item["speed"])
+        position += 1
 
     htmlSource = """
       <html>
@@ -80,11 +85,14 @@ def createHTMLFile(input):
             </ul>
             </i></p>
             </body>
-            </html>""".replace("{cpivara}", tableRows)
+            </html>
+    """.replace("{cpivara}", tableRows)
 
-    capir = input("Testing!!!")
+    atcFile = open("atc.html", "w")
+    atcFile.write(htmlSource)
+    atcFile.close()
 
-    return ""
+    os.system("start atc.html")
 
 
 # def test_extractDataInput():
@@ -112,7 +120,7 @@ def main():
 
     print("cpaivara")
 
-    shishi = createHTMLFile(aircraft_types)
+    createHTMLFile(aircraft_types)
 
     # def buildTableRow():
     #     precondition:
